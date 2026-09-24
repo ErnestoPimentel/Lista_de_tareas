@@ -1,0 +1,52 @@
+### Completado
+
+- Definición inicial del proyecto.
+- Definición del alcance funcional.
+- Definición de tecnologías.
+- Definición inicial de arquitectura.
+- Definición inicial de módulos.
+- Definición de estructura de solución.
+- Creación de la solución TaskManager.
+- Creación de TaskManager.Domain.
+- Creación de TaskManager.Application.
+- Creación de TaskManager.Infrastructure.
+- Creación de TaskManager.Web.
+- Configuración inicial de referencias entre proyectos.
+- Definición inicial del dominio.
+- Creación de la entidad base Entity.
+- Creación de la entidad User.
+- Creación de la entidad TaskItem.
+- Creación de la entidad TaskShare.
+- Creación de la entidad ScheduledTask.
+- Definición de estados de tareas.
+- Definición de prioridades.
+- Definición de permisos para tareas compartidas.
+
+### En desarrollo
+
+- Configuración de la solución.
+- Refinamiento del modelo de dominio.
+- Configuración de persistencia.
+- Configuración de autenticación.
+- Configuración de Entity Framework Core.
+
+### Pendiente
+
+- Entidades de dominio.
+- Base de datos.
+- Entity Framework Core.
+- APIs.
+- DTOs.
+- OData.
+- Microservicios.
+- Autenticación.
+- Aplicación Blazor.
+- Componentes.
+- Internacionalización.
+- Notificaciones.
+- Programación de tareas.
+- Dashboards.
+- Configuración de usuario.
+- Configuración global.
+- Pruebas.
+- Documentación final.
