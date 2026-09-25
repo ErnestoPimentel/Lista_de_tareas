@@ -5,7 +5,7 @@ using TaskManager.Domain.Enums;
 
 namespace TaskManager.Domain.Entities;
 
-public sealed class TaskItem
+public sealed class TaskItem : Entity
 {
     public Guid UserId { get; private set; }
     public string Title { get; private set; } = null!;

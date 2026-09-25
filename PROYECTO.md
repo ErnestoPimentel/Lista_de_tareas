@@ -21,6 +21,15 @@
 - Definición de estados de tareas.
 - Definición de prioridades.
 - Definición de permisos para tareas compartidas.
+- Configuración inicial de Entity Framework Core.
+- Configuración de SQL Server.
+- Creación de TaskManagerDbContext.
+- Configuración independiente de las entidades mediante IEntityTypeConfiguration.
+- Configuración de User.
+- Configuración de TaskItem.
+- Configuración de TaskShare.
+- Configuración de ScheduledTask.
+- Configuración inicial de inyección de dependencias de Infrastructure.
 
 ### En desarrollo
 
@@ -29,6 +38,10 @@
 - Configuración de persistencia.
 - Configuración de autenticación.
 - Configuración de Entity Framework Core.
+- Configuración de cadena de conexión.
+- Migraciones de Entity Framework Core.
+- Diseño de base de datos.
+- Definición de repositorios y servicios de persistencia.
 
 ### Pendiente
 
