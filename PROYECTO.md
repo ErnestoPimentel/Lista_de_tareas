@@ -30,6 +30,12 @@
 - Configuración de TaskShare.
 - Configuración de ScheduledTask.
 - Configuración inicial de inyección de dependencias de Infrastructure.
+- Registro de Infrastructure en la aplicación Web.
+- Configuración inicial de la cadena de conexión.
+- Integración de TaskManagerDbContext con ASP.NET Core.
+- Creación de la migración inicial de Entity Framework Core.
+- Creación inicial de la base de datos TaskManagerDb.
+- Generación inicial de las tablas del dominio.
 
 ### En desarrollo
 
@@ -42,19 +48,18 @@
 - Migraciones de Entity Framework Core.
 - Diseño de base de datos.
 - Definición de repositorios y servicios de persistencia.
+- Diseño definitivo de persistencia.
+- Repositorios y servicios de acceso a datos.
+- Configuración de consultas mediante OData.
 
 ### Pendiente
 
-- Entidades de dominio.
-- Base de datos.
-- Entity Framework Core.
-- APIs.
+- Autenticación.
+- Autorización.
 - DTOs.
+- APIs.
 - OData.
 - Microservicios.
-- Autenticación.
-- Aplicación Blazor.
-- Componentes.
 - Internacionalización.
 - Notificaciones.
 - Programación de tareas.
@@ -62,4 +67,3 @@
 - Configuración de usuario.
 - Configuración global.
 - Pruebas.
-- Documentación final.
