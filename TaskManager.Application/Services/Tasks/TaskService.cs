@@ -48,7 +48,7 @@ public sealed class TaskService : ITaskService
 
         task.Update(request.Title, request.Description, request.Priority, request.DueDate);
 
-        _repository.Update(task);
+        await _repository.Update(task, cancellationToken);
 
         return Map(task);
     }
@@ -60,7 +60,7 @@ public sealed class TaskService : ITaskService
         if(task is null) 
             return false;
 
-        _repository.Remove(task);
+        await _repository.Remove(task);
 
         return true;
     }

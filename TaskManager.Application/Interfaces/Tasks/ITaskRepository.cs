@@ -1,5 +1,4 @@
-﻿using TaskManager.Application.DTOs.Tasks;
-using TaskManager.Domain.Entities;
+﻿using TaskManager.Domain.Entities;
 
 namespace TaskManager.Application.Interfaces.Tasks;
 
@@ -11,7 +10,7 @@ public interface ITaskRepository
 
     Task<IReadOnlyCollection<TaskItem>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
 
-    void Update(TaskItem task);
+    Task Update(TaskItem task, CancellationToken cancellationToken = default);
 
-    void Remove(TaskItem task);
+    Task Remove(TaskItem task, CancellationToken cancellationToken = default);
 }

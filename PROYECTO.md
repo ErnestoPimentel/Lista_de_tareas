@@ -36,21 +36,17 @@
 - Creación de la migración inicial de Entity Framework Core.
 - Creación inicial de la base de datos TaskManagerDb.
 - Generación inicial de las tablas del dominio.
+- Implementación de ITaskRepository.
+- Implementación de TaskRepository mediante Entity Framework Core.
+- Implementación asíncrona de las operaciones de persistencia.
+- Registro de TaskRepository mediante inyección de dependencias.
+- Separación de persistencia respecto a la capa Application.
 
 ### En desarrollo
 
-- Configuración de la solución.
-- Refinamiento del modelo de dominio.
-- Configuración de persistencia.
-- Configuración de autenticación.
-- Configuración de Entity Framework Core.
-- Configuración de cadena de conexión.
-- Migraciones de Entity Framework Core.
-- Diseño de base de datos.
-- Definición de repositorios y servicios de persistencia.
-- Diseño definitivo de persistencia.
-- Repositorios y servicios de acceso a datos.
-- Configuración de consultas mediante OData.
+- Abstracción de unidad de trabajo y transacciones.
+- API de tareas.
+- Contratos HTTP.
 
 ### Pendiente
 
