@@ -41,12 +41,17 @@
 - Implementación asíncrona de las operaciones de persistencia.
 - Registro de TaskRepository mediante inyección de dependencias.
 - Separación de persistencia respecto a la capa Application.
+- Creación de la abstracción IUnitOfWork.
+- Implementación de UnitOfWork.
+- Separación de persistencia y confirmación de cambios.
+- Integración de UnitOfWork con TaskService.
+- Preparación para operaciones transaccionales entre múltiples entidades.
 
 ### En desarrollo
 
-- Abstracción de unidad de trabajo y transacciones.
 - API de tareas.
-- Contratos HTTP.
+- Autenticación y autorización.
+- Middleware y manejo de errores.
 
 ### Pendiente
 

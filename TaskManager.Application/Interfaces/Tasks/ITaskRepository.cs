@@ -10,7 +10,7 @@ public interface ITaskRepository
 
     Task<IReadOnlyCollection<TaskItem>> GetAllAsync(Guid userId, CancellationToken cancellationToken = default);
 
-    Task Update(TaskItem task, CancellationToken cancellationToken = default);
+    Task Update(TaskItem task);
 
-    Task Remove(TaskItem task, CancellationToken cancellationToken = default);
+    Task Remove(TaskItem task);
 }

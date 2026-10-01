@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using TaskManager.Application.DTOs.Tasks;
 using TaskManager.Application.Interfaces.Tasks;
+using TaskManager.Application.Interfaces;
 using TaskManager.Domain.Entities;
 
 namespace TaskManager.Application.Services.Tasks;
@@ -8,17 +9,25 @@ namespace TaskManager.Application.Services.Tasks;
 public sealed class TaskService : ITaskService
 {
     private readonly ITaskRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public TaskService(ITaskRepository repository)
+    public TaskService(
+        ITaskRepository repository,
+        IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<TaskResponse> CreateAsync(Guid userId, CreateTaskRequest request, CancellationToken cancellationToken = default)
+    public async Task<TaskResponse> CreateAsync(
+        Guid userId,
+        CreateTaskRequest request,
+        CancellationToken cancellationToken = default)
     {
         var task = new TaskItem(userId, request.Title, request.Description, request.Priority, request.DueDate);
 
         await _repository.AddAsync(task, cancellationToken);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Map(task);
     }
@@ -48,7 +57,8 @@ public sealed class TaskService : ITaskService
 
         task.Update(request.Title, request.Description, request.Priority, request.DueDate);
 
-        await _repository.Update(task, cancellationToken);
+        await _repository.Update(task);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Map(task);
     }
@@ -61,6 +71,7 @@ public sealed class TaskService : ITaskService
             return false;
 
         await _repository.Remove(task);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return true;
     }

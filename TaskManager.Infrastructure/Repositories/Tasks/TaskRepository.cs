@@ -19,7 +19,6 @@ public sealed class TaskRepository : ITaskRepository
         CancellationToken cancellationToken = default)
     {
         await _context.Tasks.AddAsync(task, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
     }
 
     public async Task<TaskItem?> GetByIdAsync(
@@ -28,7 +27,6 @@ public sealed class TaskRepository : ITaskRepository
         CancellationToken cancellationToken = default)
     {
         return await _context.Tasks
-            .AsNoTracking()
             .FirstOrDefaultAsync(
                 x => x.Id == taskId &&
                 x.UserId == userId,
@@ -48,15 +46,13 @@ public sealed class TaskRepository : ITaskRepository
             .ToArrayAsync(cancellationToken);
     }
 
-    public async Task Update(TaskItem task, CancellationToken cancellationToken = default)
+    public async Task Update(TaskItem task)
     {
         _context.Tasks.Update(task);
-        await _context.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task Remove(TaskItem task, CancellationToken cancellationToken = default)
+    public async Task Remove(TaskItem task)
     {
         _context.Tasks.Remove(task);
-        await _context.SaveChangesAsync(cancellationToken);
     }
 }

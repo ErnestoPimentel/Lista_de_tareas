@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using TaskManager.Application.Interfaces.Tasks;
+using TaskManager.Application.Interfaces;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Repositories.Tasks;
 
@@ -19,6 +20,7 @@ public static class DependencyInjection
         });
 
         services.AddScoped<ITaskRepository, TaskRepository>();
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         return services;
     }
