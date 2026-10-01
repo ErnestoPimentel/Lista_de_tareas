@@ -1,5 +1,6 @@
 using TaskManager.Infrastructure;
 using TaskManager.Web.Components;
+using TaskManager.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication();
 
 var app = builder.Build();
 
