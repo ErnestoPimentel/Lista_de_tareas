@@ -46,12 +46,20 @@
 - Separación de persistencia y confirmación de cambios.
 - Integración de UnitOfWork con TaskService.
 - Preparación para operaciones transaccionales entre múltiples entidades.
+- Configuración inicial de Controllers.
+- Creación de TasksController.
+- Definición de endpoints CRUD de tareas.
+- Creación de ICurrentUser.
+- Implementación inicial de CurrentUser.
+- Separación del contexto de usuario respecto del controlador.
 
 ### En desarrollo
 
+- Autenticación.
+- Autorización.
+- Claims de usuario.
+- Manejo global de excepciones.
 - API de tareas.
-- Autenticación y autorización.
-- Middleware y manejo de errores.
 
 ### Pendiente
 

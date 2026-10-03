@@ -5,6 +5,7 @@ using TaskManager.Application.Interfaces.Tasks;
 using TaskManager.Application.Interfaces;
 using TaskManager.Infrastructure.Persistence;
 using TaskManager.Infrastructure.Repositories.Tasks;
+using TaskManager.Infrastructure.Identity;
 
 namespace TaskManager.Infrastructure;
 
@@ -19,8 +20,11 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("TaskManager"));
         });
 
+        services.AddHttpContextAccessor();
+
         services.AddScoped<ITaskRepository, TaskRepository>();
         services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         return services;
     }
