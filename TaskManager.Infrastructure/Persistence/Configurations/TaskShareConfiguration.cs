@@ -29,9 +29,6 @@ public sealed class TaskShareConfiguration : IEntityTypeConfiguration<TaskShare>
             .HasForeignKey(x => x.TaskItemId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne<User>()
-            .WithMany()
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.Restrict);
+        builder.HasIndex(x => x.UserId);
     }
 }

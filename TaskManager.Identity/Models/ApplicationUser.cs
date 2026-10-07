@@ -1,24 +1,28 @@
-﻿using TaskManager.Domain.Common;
+﻿namespace TaskManager.Identity.Models;
 
-namespace TaskManager.Domain.Entities;
-
-public sealed class User : Entity
+public sealed class ApplicationUser
 {
+    public Guid Id { get; private set; }
+
     public string UserName { get; private set; } = null!;
+
     public string Email { get; private set; } = null!;
+
     public string PasswordHash { get; private set; } = null!;
+
     public string? DisplayName { get; private set; }
+
     public string? AvatarUrl { get; private set; }
+
     public string Language { get; private set; } = "es";
+
     public string Theme { get; private set; } = "system";
 
-    private User()
-    {
+    private ApplicationUser() { }
 
-    }
-
-    public User(string userName, string email, string passwordHash)
+    public ApplicationUser(string userName, string email, string passwordHash)
     {
+        Id = Guid.NewGuid();
         UserName = userName;
         Email = email;
         PasswordHash = passwordHash;
