@@ -20,11 +20,15 @@ public sealed class ApplicationUser
 
     private ApplicationUser() { }
 
-    public ApplicationUser(string userName, string email, string passwordHash)
+    public ApplicationUser(string userName, string email)
     {
         Id = Guid.NewGuid();
-        UserName = userName;
-        Email = email;
+        UserName = userName.Trim();
+        Email = email.Trim().ToLowerInvariant();
+    }
+
+    public void SetPasswordHash(string passwordHash)
+    {
         PasswordHash = passwordHash;
     }
 

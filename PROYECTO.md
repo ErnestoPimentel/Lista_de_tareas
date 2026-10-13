@@ -2,55 +2,48 @@
 
 ## Estado actual
 
-Solución en desarrollo con proyectos separados para `Domain`, `Application`, `Infrastructure`, `Identity` y `Web`. `Web` contiene la API de tareas y la base de Razor/Blazor. `Identity` se agregó recientemente como servicio separado de autenticación.
+Solución en desarrollo con proyectos separados para `Domain`, `Application`, `Infrastructure`, `Identity` y `Web`. `Identity` administra cuentas y emite tokens; `Web` expone la API de tareas y la aplicación Razor/Blazor.
 
-El CRUD de tareas está implementado a nivel de API y persiste en SQL Server. El árbol de trabajo también contiene cambios locales aún no confirmados que trasladan el modelo de usuario desde `Domain` a `Identity`.
+El flujo de autenticación ya cuenta con endpoints HTTP y el API de tareas valida JWT y exige autenticación. Hay cambios locales en curso en autenticación, validación y configuración; el árbol de trabajo no está limpio.
 
 ## Implementado
 
-- Estructura de solución y referencias entre `Domain`, `Application`, `Infrastructure` y `Web`; el proyecto `Identity` ya está incluido en la solución.
-- Dominio de tareas: `TaskItem`, `TaskShare`, `ScheduledTask`, estados, prioridades y permisos de compartición.
-- Persistencia de tareas con Entity Framework Core y SQL Server, configuraciones por entidad y migración inicial.
-- Repositorio de tareas, `UnitOfWork`, servicio de aplicación y DTOs para crear, actualizar y responder tareas.
-- `TasksController` con rutas CRUD bajo `api/tasks`; las consultas del repositorio filtran por `UserId`.
-- `ICurrentUser`/`CurrentUser` en Infrastructure para leer la identidad desde claims HTTP.
-- En `TaskManager.Identity`: modelo `ApplicationUser`, `IdentityDbContext` con configuración de usuarios e índices únicos para nombre y correo, y servicio de autenticación.
-- El servicio de Identity implementa registro e inicio de sesión, hashing/verificación con `IPasswordHasher` y generación de JWT con expiración configurable.
-- El host de Identity registra EF Core, autenticación JWT y autorización, y ejecuta `UseAuthentication`/`UseAuthorization`.
+- Dominio de tareas (`TaskItem`, `TaskShare`, `ScheduledTask`), estados, prioridades y permisos de compartición.
+- Persistencia de tareas con EF Core y SQL Server, configuraciones, repositorio, `UnitOfWork` y migración inicial.
+- Servicio de aplicación y DTOs para crear, consultar, actualizar y eliminar tareas.
+- `TasksController` con rutas CRUD bajo `api/tasks`; las operaciones usan el `UserId` del usuario actual y el repositorio filtra por propietario.
+- `ICurrentUser`/`CurrentUser` para leer el identificador de usuario desde claims.
+- Proyecto `Identity` con `ApplicationUser`, `IdentityDbContext`, índice único para nombre de usuario y correo, y migración inicial para la tabla `Users`.
+- Registro e inicio de sesión en el servicio de autenticación. Las contraseñas se procesan con `IPasswordHasher`; el registro normaliza nombre/correo, aplica anotaciones de validación y detecta usuario/correo duplicados.
+- Endpoints `POST /api/auth/register` y `POST /api/auth/login`; emiten JWT con claims de identificador, nombre y correo.
+- `Identity` configura validación JWT y autorización. `Web` también configura bearer JWT, middleware de autenticación/autorización y protege el controlador de tareas con `[Authorize]`.
 
-## Cambios locales y desalineaciones
+## Cambios locales en curso
 
-- `TaskManager.Identity` y su inclusión en la solución están sin confirmar en Git.
-- Se eliminaron localmente `Domain.Entities.User`, `UserConfiguration` y `DbSet<User>`; `TaskItem.UserId` y `TaskShare.UserId` permanecen como GUID sin relación a usuario.
-- La migración inicial de `TaskManagerDbContext` todavía crea `Users` y claves foráneas hacia ella. El modelo de Infrastructure y su migración/snapshot deben alinearse antes de aplicar una nueva estrategia de base de datos.
-- `IdentityDbContext` apunta a una base `TaskManagerIdentityDb`, pero aún no se observa una migración propia ni automatización de creación del esquema.
-- Identity no tiene todavía un `AuthenticationController`; el servicio de registro/login existe, pero no hay rutas HTTP que lo expongan.
-- La aplicación `TaskManager.Web` no registra autenticación JWT ni middleware de autenticación/autorización, y no consume el token emitido por Identity. `CurrentUser` solo puede obtener una identidad si el host le entrega claims autenticados.
-- `TaskManager.Identity/appsettings.json` contiene una clave JWT de desarrollo. Debe reemplazarse por un secreto seguro provisto fuera del repositorio antes de usar el servicio fuera del entorno local.
+- Hay modificaciones sin confirmar en los modelos y servicio de autenticación, validaciones de login/registro, controladores, configuración JWT y dependencias de `Web` e `Identity`.
+- Se agregó una migración inicial para `IdentityDbContext`.
+- `TaskManager.Web/appsettings.json` declara issuer y audience, pero no contiene `Jwt:Key`; `Identity` sí contiene una clave de desarrollo en `appsettings.json`. La clave compartida debe configurarse de forma segura en ambos procesos para que `Web` valide los tokens que emite `Identity`.
 
-## Pendiente / brechas conocidas
+## Brechas conocidas
 
-- Exponer registro/login mediante endpoints y definir validaciones, respuestas HTTP y manejo de errores para credenciales duplicadas o inválidas.
-- Conectar la validación de JWT en `TaskManager.Web` con el mismo issuer, audience y clave/llave configurados en Identity; proteger los endpoints y tomar el `UserId` solo de claims verificados.
-- Decidir cómo compartir configuración y despliegue entre los servicios Web e Identity, y cómo aprovisionar sus bases de datos.
-- Alinear migraciones, claves foráneas e índices tras el traslado del usuario a Identity; definir cómo migrar una base existente preservando datos.
-- Corregir el contrato de errores y validación de la API. `GetById` actualmente responde `200` con `null` cuando no encuentra una tarea; definir respuesta `404`.
-- Añadir proyectos y cobertura de pruebas para autenticación, autorización, persistencia y aislamiento de tareas por usuario.
-- El CRUD no expone cambio de estado. Compartición funcional y ejecución de tareas programadas tampoco están implementadas.
+- La migración/snapshot originales de `TaskManagerDbContext` aún corresponden al esquema anterior con tabla `Users` y relaciones hacia ella, mientras el modelo actual de Infrastructure ya no incluye `User`. Falta alinear y revisar la transición de esa base.
+- La migración de Identity existe, pero falta documentar/aplicar el aprovisionamiento de ambas bases (`TaskManagerIdentityDb` y `TaskManagerDb`) en los entornos correspondientes.
+- `GET /api/tasks/{taskId}` devuelve `200` con `null` si la tarea no existe; debe responder `404` de forma consistente con actualización y eliminación.
+- No hay proyectos de pruebas visibles. Se necesita verificar registro/login, compatibilidad de tokens entre servicios, acceso anónimo y separación de datos por usuario.
+- El CRUD no ofrece cambio de estado; compartir tareas, aplicar permisos de compartición y ejecutar tareas programadas no está implementado como flujo completo.
+- La clave de desarrollo incluida en configuración no debe usarse en ambientes compartidos o productivos.
 
-## Próximos pasos sugeridos
+## Qué continuar, en orden
 
-1. Completar el host de Identity con `AuthenticationController` para registro e inicio de sesión; validar entradas y devolver respuestas HTTP consistentes.
-2. Crear y aplicar la migración de `IdentityDbContext`; documentar el aprovisionamiento separado de `TaskManagerIdentityDb` y `TaskManagerDb`.
-3. Configurar `TaskManager.Web` para validar JWT con parámetros compatibles con Identity y aplicar autorización a los endpoints de tareas.
-4. Mover la clave JWT a configuración segura por entorno/secretos y revisar issuer, audience, expiración y rotación antes de despliegue.
-5. Alinear el modelo de Infrastructure, el snapshot y las migraciones con usuarios administrados por Identity; decidir la transición para bases ya creadas.
-6. Definir validaciones y errores de la API, incluida la respuesta `404` para una tarea inexistente.
-7. Añadir pruebas unitarias y de integración para registro/login, emisión y validación de JWT, acceso anónimo y propiedad de tareas.
-8. Implementar cambio de estado de tarea y después compartición con aplicación efectiva de permisos.
-9. Implementar ejecución de tareas programadas y decidir si requiere proceso de fondo y notificaciones.
-10. Priorizar perfil/preferencias, dashboards e internacionalización según necesidades; posponer OData y microservicios adicionales hasta justificar su complejidad.
+1. **Cerrar configuración y seguridad de JWT:** usar el mismo issuer, audience y clave segura en `Identity` y `Web`, proveer la clave mediante secretos/variables por ambiente, y comprobar que ningún secreto real quede versionado.
+2. **Probar el recorrido de autenticación de punta a punta:** aplicar la migración de Identity, registrar e iniciar sesión, enviar el bearer token a `Web` y confirmar que acepta el token y obtiene el `UserId` correcto.
+3. **Alinear persistencia de tareas:** actualizar el snapshot y generar una migración que quite las relaciones antiguas con `Users`; decidir cómo actualizar bases existentes sin perder tareas.
+4. **Completar el contrato HTTP:** devolver `404` en `GetById`, estandarizar errores de validación y conflictos, y confirmar las respuestas `201`, `200`, `401` y `409` de autenticación.
+5. **Añadir pruebas automatizadas:** cubrir validación de requests, hashing, emisión/validación de JWT, protección de endpoints y aislamiento por `UserId`.
+6. **Completar funciones del producto:** exponer cambio de estado; después implementar compartición con sus permisos y validar acceso del propietario/colaborador.
+7. **Implementar tareas programadas** y decidir si requieren servicio de fondo y notificaciones.
+8. **Priorizar funciones posteriores** como perfil/preferencias, dashboards e internacionalización según necesidades; diferir OData y microservicios adicionales hasta que exista una necesidad concreta.
 
-## Alcance aún no implementado
+## Alcance aún no completado
 
-Endpoints HTTP de autenticación, integración Identity-Web, migración de Identity, configuración segura de claves, alineación de migraciones de tareas, autorización efectiva, validación/errores normalizados, pruebas automatizadas, cambio de estado vía API, compartición funcional, ejecución de tareas programadas, notificaciones, perfil/preferencias, dashboards e internacionalización.
+Configuración segura común de JWT, transición de migraciones de tareas, aprovisionamiento documentado de bases, manejo consistente de respuestas y errores, pruebas automatizadas, cambio de estado vía API, compartición funcional, ejecución de tareas programadas, notificaciones, perfil/preferencias, dashboards e internacionalización.

@@ -41,17 +41,13 @@ public sealed class AuthenticationService : IAuthenticationService
 
         var user = new ApplicationUser(
             request.UserName,
-            request.Email,
-            string.Empty);
+            request.Email);
 
         var passwordHash = _passwordHasher.HashPassword(
             user,
             request.Password);
 
-        user = new ApplicationUser(
-            request.UserName,
-            request.Email,
-            passwordHash);
+        user.SetPasswordHash(passwordHash);
 
         await _context.User.AddAsync(user, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);

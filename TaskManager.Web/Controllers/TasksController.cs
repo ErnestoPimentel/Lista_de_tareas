@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using TaskManager.Application.DTOs.Tasks;
 using TaskManager.Application.Interfaces;
 using TaskManager.Application.Interfaces.Tasks;
@@ -7,6 +8,7 @@ namespace TaskManager.Web.Controllers;
 
 [ApiController]
 [Route("api/tasks")]
+[Authorize]
 public sealed class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -22,7 +24,6 @@ public sealed class TasksController : ControllerBase
     public async Task<ActionResult<IReadOnlyCollection<TaskResponse>>> GetAll(
         CancellationToken cancellationToken)
     {
-        EnsureAuthenticated();
         var tasks = await _taskService.GetAllAsync(_currentUser.UserId, cancellationToken);
         return Ok(tasks);
     }
@@ -32,8 +33,6 @@ public sealed class TasksController : ControllerBase
         Guid taskId,
         CancellationToken cancellationToken)
     {
-        EnsureAuthenticated();
-
         var task = await _taskService.GetByIdAsync(_currentUser.UserId, taskId, cancellationToken);
 
         return Ok(task);
@@ -44,7 +43,6 @@ public sealed class TasksController : ControllerBase
         CreateTaskRequest request,
         CancellationToken cancellationToken)
     {
-        EnsureAuthenticated();
         var task = await _taskService.CreateAsync(_currentUser.UserId, request, cancellationToken);
 
         return CreatedAtAction(
@@ -59,8 +57,6 @@ public sealed class TasksController : ControllerBase
         UpdateTaskRequest request,
         CancellationToken cancellationToken)
     {
-        EnsureAuthenticated();
-
         var task = await _taskService.UpdateAsync(
             _currentUser.UserId,
             taskId,
@@ -78,8 +74,6 @@ public sealed class TasksController : ControllerBase
         Guid taskId,
         CancellationToken cancellationToken)
     {
-        EnsureAuthenticated();
-
         var deleted = await _taskService.DeleteAsync(
             _currentUser.UserId,
             taskId,
@@ -89,11 +83,5 @@ public sealed class TasksController : ControllerBase
             return NotFound();
 
         return NoContent();
-    }
-
-    private void EnsureAuthenticated()
-    {
-        if(!_currentUser.IsAuthenticated)
-            throw new UnauthorizedAccessException("User is not authenticated.");
     }
 }
