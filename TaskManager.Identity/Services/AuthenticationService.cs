@@ -30,9 +30,26 @@ public sealed class AuthenticationService : IAuthenticationService
         RegisterRequest request,
         CancellationToken cancellationToken = default)
     {
+        if(string.IsNullOrWhiteSpace(request.UserName) ||
+            string.IsNullOrWhiteSpace(request.Email) ||
+            string.IsNullOrWhiteSpace(request.Password))
+        {
+            throw new ArgumentException("Username, email and password are required.");
+        }
+
+        if(!CredentialValidator.IsValidPassword(request.Password))
+        {
+            throw new ArgumentException(
+                "The password must contain at least 12 characters, " +
+                "including uppercase, lowercase and numeric characters.");
+        }
+
+        var userName = CredentialValidator.NormalizeUserName(request.UserName);
+        var email = CredentialValidator.NormalizeEmail(request.Email);
+
         var exists = await _context.User.AnyAsync(
-            x => x.UserName == request.UserName
-            || x.Email == request.Email,
+            x => x.UserName == userName
+            || x.Email == email,
             cancellationToken);
 
         if (exists)
@@ -40,8 +57,8 @@ public sealed class AuthenticationService : IAuthenticationService
                 "The username or email is already registered.");
 
         var user = new ApplicationUser(
-            request.UserName,
-            request.Email);
+            userName,
+            email);
 
         var passwordHash = _passwordHasher.HashPassword(
             user,
