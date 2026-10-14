@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Linq.Expressions;
 using System.Text;
 using TaskManager.Identity.Data;
 using TaskManager.Identity.Models;
 using TaskManager.Identity.Services;
+using TaskManager.Identity.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -44,6 +44,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

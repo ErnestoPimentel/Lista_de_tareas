@@ -20,18 +20,11 @@ public sealed class AuthenticationController : ControllerBase
         RegisterRequest request,
         CancellationToken cancellationToken)
     {
-        try
-        {
-            var response = await _authenticationService.RegisterAsync(
-                request,
-                cancellationToken);
+        var response = await _authenticationService.RegisterAsync(
+            request,
+            cancellationToken);
 
-            return Created("/api/auth/login", response);
-        }
-        catch(InvalidOperationException exception)
-        {
-            return Conflict(new { message = exception.Message });
-        }
+        return Created("/api/auth/login", response);
     }
 
     [HttpPost("login")]
