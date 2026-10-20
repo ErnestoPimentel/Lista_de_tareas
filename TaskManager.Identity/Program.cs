@@ -61,3 +61,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+//No es necesario, ya que es accesible por IdentityApiFactory
+//public partial class Program;

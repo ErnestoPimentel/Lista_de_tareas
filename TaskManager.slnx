@@ -9,4 +9,8 @@
     <Project Path="TaskManager.Infrastructure/TaskManager.Infrastructure.csproj" />
     <Project Path="TaskManager.Web/TaskManager.Web.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="TaskManager.Identity.IntegrationTests/TaskManager.Identity.IntegrationTests.csproj" Id="474899f0-d818-4748-98b2-7d786cc777cb" />
+    <Project Path="TaskManager.Identity.UnitTests/TaskManager.Identity.UnitTests.csproj" Id="47c1af92-6293-4c5f-9cf2-a7b038914c2f" />
+  </Folder>
 </Solution>
