@@ -1,6 +1,7 @@
 using TaskManager.Infrastructure;
 using TaskManager.Web.Components;
 using TaskManager.Application;
+using TaskManager.Web.Services.Authentication;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -38,6 +39,14 @@ builder.Services
     });
 
 builder.Services.AddAuthorization();
+
+builder.Services.AddScoped<TokenSession>();
+builder.Services.AddHttpClient<IdentityApiClient>(client =>
+{
+    var identiyUrl = builder.Configuration["Services:Identity"]
+        ?? throw new InvalidOperationException("Identity service URL is not configured.");
+    client.BaseAddress = new Uri(identiyUrl);
+});
 
 var app = builder.Build();
 
