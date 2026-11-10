@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TaskManager.Identity.Data;
 using TaskManager.Identity.Models;
-using TaskManager.Identity.Models.Authentication;
+using TaskManager.Contracts.Authentication;
 
 namespace TaskManager.Identity.Services;
 

@@ -5,6 +5,7 @@ using TaskManager.Web.Services.Authentication;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddControllers();
+//builder.Services.AddAuthorizationCore();
 
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new InvalidOperationException(
@@ -41,6 +43,10 @@ builder.Services
 builder.Services.AddAuthorization();
 
 builder.Services.AddScoped<TokenSession>();
+builder.Services.AddScoped<JwtAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider>(
+    provider => provider.GetRequiredService<JwtAuthenticationStateProvider>());
+builder.Services.AddScoped<AuthenticationSessionService>();
 builder.Services.AddHttpClient<IdentityApiClient>(client =>
 {
     var identiyUrl = builder.Configuration["Services:Identity"]

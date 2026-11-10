@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskManager.Identity.Models.Authentication;
+namespace TaskManager.Contracts.Authentication;
 
 public sealed record RegisterRequest(
     [Required]

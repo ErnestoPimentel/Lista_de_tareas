@@ -1,4 +1,5 @@
-using TaskManager.Identity.Models.Authentication;
+using System.Net.Http.Json;
+using TaskManager.Contracts.Authentication;
 
 namespace TaskManager.Web.Services.Authentication;
 
@@ -13,7 +14,7 @@ public sealed class IdentityApiClient
 
     public async Task<AuthenticationResponse?> LoginAsync(
         LoginRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         using var response = await _httpClient.PostAsJsonAsync(
             "api/auth/login",
@@ -29,7 +30,7 @@ public sealed class IdentityApiClient
 
     public async Task<AuthenticationResponse?> RegisterAsync(
         RegisterRequest request,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken = default)
     {
         using var response = await _httpClient.PostAsJsonAsync(
             "api/auth/register",

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using TaskManager.Identity.Models.Authentication;
+using TaskManager.Contracts.Authentication;
 
 namespace TaskManager.Identity.IntegrationTests;
 

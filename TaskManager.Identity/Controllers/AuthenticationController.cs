@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using TaskManager.Identity.Models.Authentication;
+using TaskManager.Contracts.Authentication;
 using TaskManager.Identity.Services;
 
 namespace TaskManager.Identity.Controllers;

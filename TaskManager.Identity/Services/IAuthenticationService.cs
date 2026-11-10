@@ -1,4 +1,4 @@
-﻿using TaskManager.Identity.Models.Authentication;
+﻿using TaskManager.Contracts.Authentication;
 
 namespace TaskManager.Identity.Services;
 

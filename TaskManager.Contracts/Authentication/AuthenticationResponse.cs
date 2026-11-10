@@ -1,4 +1,4 @@
-﻿namespace TaskManager.Identity.Models.Authentication;
+﻿namespace TaskManager.Contracts.Authentication;
 
 public sealed record AuthenticationResponse(
     Guid UserId,

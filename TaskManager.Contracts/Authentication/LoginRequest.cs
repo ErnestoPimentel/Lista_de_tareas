@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TaskManager.Identity.Models.Authentication;
+namespace TaskManager.Contracts.Authentication;
 
 public sealed record LoginRequest(
     [Required]
@@ -10,3 +10,4 @@ public sealed record LoginRequest(
     [Required]
     [StringLength(128, MinimumLength = 1)]
     string Password);
+
