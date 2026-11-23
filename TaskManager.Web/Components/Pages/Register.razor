@@ -1,0 +1,145 @@
+﻿@page "/register"
+
+@using TaskManager.Contracts.Authentication
+@using TaskManager.Web.Models.Authentication
+@using TaskManager.Web.Services.Authentication
+
+@inject AuthenticationSessionService AuthenticationService
+@inject NavigationManager Navigation
+
+<PageTitle>
+    Crear cuenta
+</PageTitle>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-logo">
+                TM
+            </div>
+            <h1>
+                Crear cuenta
+            </h1>
+            <p>
+                Registrate para comenzar a administrar tus tareas.
+            </p>
+        </div>
+        <EditForm Model="@Model" OnValidSubmit="@HandleRegisterAsync">
+            <DataAnnotationsValidator />
+            <div class="form-group">
+                <label for="username">
+                    Nombre de usuario
+                </label>
+                <InputText
+                    id="username"
+                    @bind-Value="Model.UserName"
+                    placeholder="Tu nombre de usuario"
+                    autocomplete="username"
+                    class="form-control"/>
+                <ValidationMessage For="@(() => Model.UserName)" />
+            </div>
+            <div class="form-group">
+                <label for="email">
+                    Correo electrónico
+                </label>
+                <InputText
+                    id="email"
+                    type="email"
+                    @bind-Value="Model.Email"
+                    placeholder="correo@ejemplo.com"
+                    autocomplete="email"
+                    class="form-control"/>
+                <ValidationMessage For="(() => Model.Email)" />
+            </div>
+            <div class="form-group">
+                <label for="password">
+                    Contraseña
+                </label>
+                <InputText
+                    id="password"
+                    type="password"
+                    @bind-Value="Model.Password"
+                    placeholder="Minimo 12 caracteres"
+                    autocomplete="new-password"
+                    class="form-control"/>
+                <ValidationMessage For="(() => Model.Password)" />
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">
+                    Confirmar contraseña
+                </label>
+                <InputText
+                    id="confirmPassword"
+                    type="password"
+                    @bind-Value="Model.ConfirmPassword"
+                    placeholder="Repite tu contraseña"
+                    autocomplete="new-password"
+                    class="form-control"/>
+                <ValidationMessage For="@(() => Model.ConfirmPassword)" />
+            </div>
+            @if (!string.IsNullOrWhiteSpace(ErrorMessage))
+            {
+                <div class="login-error" role="alert">
+                    @ErrorMessage
+                </div>
+            }
+            <button type="submit" class="login-button" disabled="@IsLoading">
+                @if (IsLoading)
+                {
+                    <span>
+                        Creando cuenta...
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        Crear cuenta
+                    </span>
+                }
+            </button>
+        </EditForm>
+        <div class="login-footer">
+            <span>
+                ¿Ya tienes una cuenta?
+            </span>
+            <a href="/login">Iniciar sesión</a>
+        </div>
+    </div>
+</div>
+
+@code{
+    private RegisterFormModel Model { get; set; } = new();
+    private bool IsLoading { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    private async Task HandleRegisterAsync()
+    {
+        IsLoading = true;
+        ErrorMessage = null;
+
+        try
+        {
+            var request = new RegisterRequest(
+                Model.UserName,
+                Model.Email,
+                Model.Password
+            );
+            var result = await AuthenticationService.RegisterAsync(request);
+
+            if(!result)
+            {
+                ErrorMessage = "No se pudo completar el registro. Comprueba si el usuario o correo ya estan registrados.";
+                return;
+            }
+            Navigation.NavigateTo("/");
+        }
+        catch (HttpRequestException)
+        {
+            ErrorMessage = "No fue posible conectar con el servicio de autenticacion.";
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+}
