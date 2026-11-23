@@ -58,5 +58,11 @@ public sealed class AuthenticationSessionService
         return true;
     }
 
+    public Task LogoutAsync()
+    {
+        _authenticationStateProvider.NotifyUserLogout();
+        return Task.CompletedTask;
+    }
+
     public void Logout() => _authenticationStateProvider.NotifyUserLogout();
 }

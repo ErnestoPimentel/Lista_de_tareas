@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using TaskManager.Web.Services.Authentication
+
+@inject AuthenticationSessionService AuthenticationService
+@inject NavigationManager Navigation
+
+<AuthorizeView>
+    <Authorized Context="authState">
+        <div class="authentication-menu">
+            <span class="authentication-menu__username">
+                @authState.User.Identity?.Name
+            </span>
+            <button type="button" class="authentication-menu__logout" @onclick="LogoutAsync">
+                Cerrar sesión
+            </button>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="authentication-menu">
+            <a href="/login">Iniciar sesión</a>
+            <a href="/register">Crear cuenta</a>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code{
+    private async Task LogoutAsync()
+    {
+        await AuthenticationService.LogoutAsync();
+        Navigation.NavigateTo("/login");
+    }
+}
