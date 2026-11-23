@@ -2,46 +2,69 @@
 
 ## Estado actual
 
-Solución en desarrollo con proyectos `Domain`, `Application`, `Infrastructure`, `Identity` y `Web`. Identity administra cuentas y emite JWT; Web contiene la API de tareas y la interfaz Blazor Server.
+Solución en desarrollo sobre .NET 10. Incluye una API de tareas, una interfaz Blazor Server y un servicio separado de identidad. El flujo de registro e inicio de sesión está conectado a la interfaz y usa JWT.
 
-El flujo HTTP de registro/login y la protección JWT de tareas están implementados. También hay validación de credenciales, manejo centralizado de excepciones en Identity, guía de configuración en `README.md` y los primeros proyectos de pruebas. Web ya registra un cliente HTTP para Identity y una sesión de token, aunque todavía no se observan componentes de interfaz que usen esos servicios para completar el inicio de sesión ni envío del token en las solicitudes de tareas desde Blazor.
+### Proyectos
 
-## Implementado
+| Proyecto | Responsabilidad |
+| --- | --- |
+| `TaskManager.Domain` | Entidades y enums del dominio de tareas. |
+| `TaskManager.Application` | Servicios, DTOs e interfaces de aplicación. |
+| `TaskManager.Infrastructure` | Persistencia SQL Server, Entity Framework Core y repositorios. |
+| `TaskManager.Contracts` | Requests y responses compartidos entre Web e Identity. |
+| `TaskManager.Identity` | Registro, inicio de sesión, validación de credenciales y emisión de JWT. |
+| `TaskManager.Web` | Interfaz Blazor Server y API protegida de tareas. |
+| `TaskManager.Identity.UnitTests` | Pruebas unitarias de reglas de credenciales. |
+| `TaskManager.Identity.IntegrationTests` | Pruebas HTTP de registro e inicio de sesión. |
 
-- Dominio de tareas (`TaskItem`, `TaskShare`, `ScheduledTask`), estados, prioridades y permisos de compartición.
-- Persistencia de tareas con EF Core y SQL Server, configuraciones, repositorio, `UnitOfWork` y migración inicial.
-- Servicio de aplicación y DTOs para crear, consultar, actualizar y eliminar tareas.
-- `TasksController` bajo `api/tasks`, protegido con `[Authorize]`; las operaciones obtienen el usuario del claim `NameIdentifier` y filtran por propietario.
-- Proyecto `Identity` con `ApplicationUser`, `IdentityDbContext`, índices únicos para nombre/correo y migración inicial de usuarios.
-- Endpoints `POST /api/auth/register` y `POST /api/auth/login`; contraseñas con `IPasswordHasher` y JWT con claims de identificador, nombre y correo.
-- Validación de registro: campos requeridos, longitudes, correo válido y contraseña de 12 a 128 caracteres con mayúscula, minúscula y número. Nombre/correo se normalizan y se comprueban duplicados.
-- Middleware de excepciones en Identity que devuelve Problem Details: errores de entrada `400`, conflictos `409` y errores no controlados `500` con detalle genérico al cliente.
-- Cliente HTTP `IdentityApiClient`, sesión `TokenSession` y registro de ambos servicios en Web como base para conectar la interfaz con Identity.
-- `README.md` documenta requisitos, configuración de bases/JWT, migraciones, ejecución local y endpoints.
-- SDK .NET fijado en `global.json` a la versión `10.0.403`.
-- Proyectos de pruebas en la solución: pruebas unitarias de normalización/reglas de contraseña y pruebas de integración de registro e inicio de sesión de Identity usando `WebApplicationFactory` y base InMemory.
+## Funcionalidad implementada
 
-## Brechas conocidas
+### Tareas
 
-- **Clave JWT:** Web necesita `Jwt:Key`; Identity conserva una clave de desarrollo en `appsettings.json`. La configuración compartida se explica en README, pero debe usarse un secreto seguro por ambiente y retirar la clave de ejemplo del archivo versionado.
-- **Migración de tareas heredada:** el modelo actual de Infrastructure ya no incluye `User`, pero la migración inicial y el snapshot de `TaskManagerDbContext` todavía incluyen `Users` y relaciones con tareas/comparticiones. Falta alinear el esquema y planear una transición segura para bases existentes.
-- **Integración de la interfaz:** Web registra `IdentityApiClient` y `TokenSession`, pero no se encontraron usos en componentes Razor/Blazor. Tampoco se ve aún un flujo de login/logout de interfaz ni un mecanismo que adjunte el bearer token a las llamadas protegidas.
-- **Manejo de errores en Web:** el middleware centralizado solo está registrado en Identity. La API Web necesita respuestas de error HTTP consistentes para sus propias excepciones.
-- **Contrato de tareas:** `GET /api/tasks/{taskId}` responde `200` con `null` si no encuentra la tarea; debería responder `404`.
-- **Cobertura de pruebas:** las pruebas actuales cubren reglas de credenciales y registro/login. Faltan pruebas para JWT entre servicios, endpoints protegidos de tareas, aislamiento por usuario, persistencia y flujos de error.
-- **Funciones pendientes:** la API no expone cambio de estado; compartir tareas con permisos y ejecutar tareas programadas siguen pendientes.
+- Crear, consultar, actualizar y eliminar tareas.
+- Filtrar las operaciones por el identificador del usuario autenticado.
+- Persistir tareas, comparticiones y tareas programadas con EF Core y SQL Server.
+- Usar repositorio, `UnitOfWork` y servicios de Application.
 
-## Qué continuar, en orden
+### Identidad e interfaz
 
-1. **Completar el flujo de autenticación en Blazor:** crear pantallas/componentes de registro e inicio/cierre de sesión, guardar y limpiar el token de forma adecuada, y enviar el bearer token a las solicitudes protegidas. Definir cómo funcionará la autenticación en el circuito de Blazor Server.
-2. **Asegurar y verificar JWT entre hosts:** reemplazar la clave de desarrollo versionada por secretos/variables de entorno comunes y comprobar que Identity emite tokens aceptados por Web.
-3. **Alinear la base de tareas:** crear/revisar una migración para eliminar las relaciones heredadas a `Users`, revisar el snapshot, validar instrucciones del README y conservar tareas existentes.
-4. **Cerrar el contrato y los errores de Web:** devolver `404` desde `GetById` cuando no hay resultado y definir manejo Problem Details para errores de la API.
-5. **Ampliar pruebas automatizadas:** validar JWT y claims, acceso anónimo, autorización de tareas, aislamiento entre usuarios, persistencia y respuestas de error; incluir el flujo de autenticación desde la interfaz cuando exista.
-6. **Completar funcionalidad de tareas:** agregar cambio de estado, luego compartir con aplicación efectiva de permisos de propietario/colaborador.
-7. Implementar ejecución de tareas programadas y decidir si necesita proceso de fondo y notificaciones.
-8. Priorizar perfil/preferencias, dashboards e internacionalización según necesidades; diferir OData y más microservicios hasta que exista una razón concreta.
+- Registrar usuarios e iniciar sesión mediante `POST /api/auth/register` y `POST /api/auth/login`.
+- Guardar contraseñas usando `IPasswordHasher` y validar los datos de registro.
+- Emitir JWT con claims de identificador, nombre y correo.
+- Validar JWT y proteger la API de tareas con `[Authorize]`.
+- Mostrar páginas Blazor de registro e inicio de sesión, estado de autenticación y menú para iniciar/cerrar sesión.
+- Compartir modelos de autenticación mediante `TaskManager.Contracts`.
+- Manejar errores de forma centralizada en el host de Identity.
 
-## Alcance aún no completado
+### Pruebas disponibles
 
-Flujo de autenticación completo en la interfaz Blazor, almacenamiento/configuración segura de JWT, alineación de migraciones de tareas, manejo uniforme de errores en Web, respuesta `404` de consultas individuales, pruebas de autorización e integración Web, cambio de estado por API, compartición funcional, tareas programadas, notificaciones, perfil/preferencias, dashboards e internacionalización.
+- Pruebas unitarias de normalización de nombre y correo, y de reglas de contraseña.
+- Pruebas de integración de Identity para registro correcto, inicio de sesión correcto y contraseña incorrecta.
+- Las pruebas de integración de Identity usan `WebApplicationFactory` y una base InMemory.
+
+## Limitaciones y pendientes conocidos
+
+- **La sesión del navegador no es persistente.** `TokenSession` guarda el token en memoria; al finalizar el circuito de Blazor o crear uno nuevo, el usuario puede perder la sesión.
+- **La interfaz aún no consume la API de tareas.** `IdentityApiClient` llama a Identity para registrar e iniciar sesión, pero no se observa una interfaz de tareas que envíe el bearer token a los endpoints protegidos.
+- **La clave JWT es de desarrollo y está en configuración versionada.** Debe sustituirse por secretos o variables de entorno para cada ambiente.
+- **El esquema de tareas conserva referencias antiguas a usuarios.** La migración inicial y el snapshot de `TaskManagerDbContext` incluyen `Users` y claves foráneas que ya no están en el modelo actual de Infrastructure.
+- **La API responde `200` con `null` en una consulta sin resultados.** `GET /api/tasks/{taskId}` debería devolver `404` cuando la tarea no existe.
+- **El manejo centralizado de excepciones está solo en Identity.** Web aún requiere respuestas de error consistentes para su API.
+- **La cobertura de pruebas es parcial.** No hay pruebas de autorización de tareas, aislamiento entre usuarios, persistencia de tareas ni del flujo de autenticación completo desde la interfaz.
+- No se ha implementado el cambio de estado por API, la compartición efectiva de tareas ni la ejecución de tareas programadas.
+
+## Próximos pasos recomendados
+
+1. **Conectar Blazor con la API de tareas:** implementar llamadas autenticadas que adjunten el JWT y crear la experiencia para listar y administrar tareas.
+2. **Definir la duración y persistencia de sesión:** decidir cómo restaurar, expirar y cerrar sesión de forma coherente con Blazor Server.
+3. **Mover la clave JWT a configuración segura:** usar el mismo secreto, issuer y audience en Identity y Web mediante configuración por ambiente.
+4. **Alinear el esquema de tareas:** crear y revisar una migración que quite las referencias heredadas a `Users`; definir cómo actualizar bases existentes sin perder tareas.
+5. **Completar el contrato de la API:** devolver `404` desde `GetById` cuando no exista la tarea y estandarizar el manejo de errores HTTP en Web.
+6. **Ampliar las pruebas:** cubrir JWT, rutas protegidas, aislamiento de datos por usuario, persistencia y errores de API.
+7. **Completar las funciones de tareas:** agregar cambio de estado y después implementar compartición con aplicación de permisos.
+8. **Implementar tareas programadas** y determinar si requieren procesamiento en segundo plano y notificaciones.
+9. Priorizar perfil, preferencias, dashboards e internacionalización según las necesidades del producto.
+
+## Alcance futuro
+
+Compartición funcional, tareas programadas y notificaciones, perfil y preferencias, dashboards e internacionalización. OData y más microservicios pueden evaluarse cuando exista una necesidad concreta.

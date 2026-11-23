@@ -9,9 +9,11 @@ TaskManager es una solución en desarrollo para administrar tareas. Está constr
 - API autenticada para crear, consultar, actualizar y eliminar tareas propias.
 - Tareas con título, descripción, prioridad, estado y fecha de vencimiento.
 - Interfaz Blazor Server en el proyecto `TaskManager.Web`.
+- Páginas Blazor para registro e inicio de sesión, con estado de autenticación y cierre de sesión.
 - Persistencia SQL Server y migraciones de Entity Framework Core.
+- Pruebas unitarias de credenciales y pruebas de integración para registro e inicio de sesión de Identity.
 
-Compartir tareas, ejecutar tareas programadas, cambiar el estado desde la API y las pruebas automatizadas todavía no están implementados.
+Compartir tareas, ejecutar tareas programadas y cambiar el estado desde la API todavía no están implementados.
 
 ## Requisitos
 
@@ -57,7 +59,7 @@ $env:Jwt__Issuer = "TaskManager.Identity"
 $env:Jwt__Audience = "TaskManager"
 ```
 
-La configuración del entorno tiene precedencia sobre `appsettings.json`. No uses la clave de ejemplo incluida en Identity fuera del entorno local ni guardes secretos reales en el repositorio.
+La configuración del entorno tiene precedencia sobre `appsettings.json`. No uses las claves de ejemplo incluidas en los archivos `appsettings.json` fuera del entorno local ni guardes secretos reales en el repositorio.
 
 ## Restaurar, compilar y ejecutar
 
@@ -159,8 +161,11 @@ Los valores numéricos de `priority` corresponden al enum `TaskPriority` del dom
 | `TaskManager.Domain` | Entidades y enums del dominio. |
 | `TaskManager.Application` | Servicios, DTOs e interfaces de aplicación. |
 | `TaskManager.Infrastructure` | EF Core, SQL Server y repositorios de tareas. |
+| `TaskManager.Contracts` | Requests y responses compartidos entre Identity y Web. |
 | `TaskManager.Identity` | Registro, inicio de sesión, JWT y base de usuarios. |
 | `TaskManager.Web` | Interfaz Blazor Server y API de tareas. |
+| `TaskManager.Identity.UnitTests` | Pruebas unitarias de validación de credenciales. |
+| `TaskManager.Identity.IntegrationTests` | Pruebas HTTP de registro e inicio de sesión. |
 
 ## Migraciones
 
@@ -176,9 +181,11 @@ La migración inicial de tareas conserva una tabla `Users` y relaciones heredada
 ## Estado y limitaciones conocidas
 
 - `TaskManager.Web` necesita `Jwt:Key` para arrancar; define la clave compartida mediante configuración del entorno.
+- La sesión JWT de Blazor se conserva en memoria y no necesariamente sobrevive a un circuito nuevo o a una recarga.
+- La interfaz aún no ofrece una experiencia para consumir los endpoints de tareas con el bearer token.
 - Las migraciones de tareas contienen el esquema legado de usuarios mencionado arriba.
 - `GET /api/tasks/{taskId}` responde actualmente con `200` y `null` cuando la tarea no existe; el contrato puede cambiar a `404`.
-- No hay proyectos de pruebas en la solución.
+- Las pruebas existentes cubren validación de credenciales y registro/login de Identity; faltan pruebas de autorización, tareas y persistencia.
 - La compartición, el cambio de estado por API y la ejecución de tareas programadas están pendientes.
 
 Consulta [PROYECTO.md](PROYECTO.md) para conocer el estado de desarrollo y las siguientes tareas previstas.
